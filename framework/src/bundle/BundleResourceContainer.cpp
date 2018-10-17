@@ -40,7 +40,7 @@ namespace cppmicroservices {
 BundleResourceContainer::BundleResourceContainer(const std::string& location)
   : m_Location(location)
   , m_ZipArchive()
-  , m_Data()
+  , m_RawBundleResourceData()
 {
   if (!util::Exists(location)) {
     throw std::runtime_error(m_Location + " does not exist");
@@ -51,11 +51,11 @@ BundleResourceContainer::BundleResourceContainer(const std::string& location)
   // less than optimal way, in terms of memory utilization.
   try {
     auto objFile = BundleObjFactory().CreateBundleFileObj(location);
-    m_Data = objFile->GetRawBundleResourceContainer();
+    m_RawBundleResourceData = objFile->GetRawBundleResourceContainer();
   } catch(...) {}
 
-  if (!m_Data ||
-      !mz_zip_reader_init_mem(&m_ZipArchive, m_Data->m_Data.get(), m_Data->m_DataSize, 0)) {
+  if (!m_RawBundleResourceData ||
+      !mz_zip_reader_init_mem(&m_ZipArchive, m_RawBundleResourceData->m_Data.get(), m_RawBundleResourceData->m_DataSize, 0)) {
     if (!mz_zip_reader_init_file(&m_ZipArchive, m_Location.c_str(), 0)) {
       throw std::runtime_error("Could not init zip archive for bundle at " + m_Location);
     }
